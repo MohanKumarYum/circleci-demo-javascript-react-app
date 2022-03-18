@@ -4,9 +4,32 @@ workflows:
   build-deploy:
     jobs:
       - build
+  nightly:
+    triggers:
+      - schedule:
+          cron: "0 * * * *"
+          filters:
+            branches:
+              only:
+                - master
+    jobs:
+      - build
+      - deploy
+
 
 jobs:
   build:
+    docker:
+      - image: cimg/node:14.19.0
+    steps:
+      - checkout
+      - run:
+          name: Install dependencies
+          command: npm install
+      - run:
+          name: Execute tests
+          command: npm run test
+  deploy:
     docker:
       - image: cimg/node:14.19.0
     steps:
